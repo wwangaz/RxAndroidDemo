@@ -5,27 +5,19 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.wangweimin.rxandrioddemo.HttpRequest.HttpMethods;
 import com.example.wangweimin.rxandrioddemo.R;
 import com.example.wangweimin.rxandrioddemo.entity.MovieEntity;
-import com.example.wangweimin.rxandrioddemo.service.MovieService;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
-import retrofit2.converter.gson.GsonConverterFactory;
 import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
     @Bind(R.id.main_text_view)
@@ -49,35 +41,25 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void getMovie(){
-        String baseUrl = "https://api.douban.com/v2/movie/";
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(baseUrl)
-                .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-                .build();
+    public void getMovie() {
+        Subscriber<MovieEntity> subscriber = new Subscriber<MovieEntity>() {
+            @Override
+            public void onCompleted() {
+                Toast.makeText(MainActivity.this, "Get Top Movie Completed", Toast.LENGTH_SHORT).show();
+            }
 
-        MovieService movieService = retrofit.create(MovieService.class);
+            @Override
+            public void onError(Throwable e) {
+                mTextView.setText(e.getMessage());
+            }
 
-        movieService.getTopMovie(0,10)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<MovieEntity>() {
-                    @Override
-                    public void onCompleted() {
-                        Toast.makeText(MainActivity.this, "Get Top Movie Completed", Toast.LENGTH_SHORT).show();
-                    }
+            @Override
+            public void onNext(MovieEntity movieEntity) {
+                mTextView.setText(movieEntity.toString());
+            }
+        };
 
-                    @Override
-                    public void onError(Throwable e) {
-                        mTextView.setText(e.getMessage());
-                    }
-
-                    @Override
-                    public void onNext(MovieEntity movieEntity) {
-                        mTextView.setText(movieEntity.toString());
-                    }
-                });
+        HttpMethods.getInstance().getTopMovie(subscriber, 0, 10);
     }
 
     @Override
