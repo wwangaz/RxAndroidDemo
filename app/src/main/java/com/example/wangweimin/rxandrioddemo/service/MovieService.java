@@ -1,5 +1,6 @@
 package com.example.wangweimin.rxandrioddemo.service;
 
+import com.example.wangweimin.rxandrioddemo.HttpRequest.HttpResult;
 import com.example.wangweimin.rxandrioddemo.entity.MovieEntity;
 
 import retrofit2.http.GET;
@@ -11,5 +12,5 @@ import rx.Observable;
  */
 public interface MovieService {
     @GET("top250")
-    Observable<MovieEntity> getTopMovie(@Query("start") int start, @Query("count") int count);
+    Observable<HttpResult<MovieEntity>> getTopMovie(@Query("start") int start, @Query("count") int count);
 }

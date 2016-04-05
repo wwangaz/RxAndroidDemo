@@ -48,6 +48,7 @@ public class HttpMethods {
 
     public void getTopMovie(Subscriber<MovieEntity> subscriber, int start, int count){
         movieService.getTopMovie(start, count)
+                .map(new HttpResultFunc<MovieEntity>())
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
