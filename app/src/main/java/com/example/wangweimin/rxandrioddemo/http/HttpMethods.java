@@ -1,4 +1,4 @@
-package com.example.wangweimin.rxandrioddemo.HttpRequest;
+package com.example.wangweimin.rxandrioddemo.http;
 
 import com.example.wangweimin.rxandrioddemo.entity.MovieEntity;
 import com.example.wangweimin.rxandrioddemo.service.MovieService;
@@ -48,6 +48,7 @@ public class HttpMethods {
 
     public void getTopMovie(Subscriber<MovieEntity> subscriber, int start, int count){
         movieService.getTopMovie(start, count)
+                .map(new HttpResultFunc<MovieEntity>())
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

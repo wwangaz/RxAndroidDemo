@@ -1,4 +1,4 @@
-package com.example.wangweimin.rxandrioddemo.HttpRequest;
+package com.example.wangweimin.rxandrioddemo.http;
 
 /**
  * Created by wangweimin on 16/4/5.

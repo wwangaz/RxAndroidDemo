@@ -9,15 +9,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.wangweimin.rxandrioddemo.HttpRequest.HttpMethods;
 import com.example.wangweimin.rxandrioddemo.R;
 import com.example.wangweimin.rxandrioddemo.entity.MovieEntity;
+import com.example.wangweimin.rxandrioddemo.http.HttpMethods;
+import com.example.wangweimin.rxandrioddemo.subsciber.ProgressSubscriber;
+import com.example.wangweimin.rxandrioddemo.subsciber.SubscriberOnNextListener;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import rx.Subscriber;
 
 public class MainActivity extends AppCompatActivity {
     @Bind(R.id.main_text_view)
@@ -42,23 +42,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void getMovie() {
-        Subscriber<MovieEntity> subscriber = new Subscriber<MovieEntity>() {
-            @Override
-            public void onCompleted() {
-                Toast.makeText(MainActivity.this, "Get Top Movie Completed", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                mTextView.setText(e.getMessage());
-            }
-
+        SubscriberOnNextListener<MovieEntity> nextListener = new SubscriberOnNextListener<MovieEntity>() {
             @Override
             public void onNext(MovieEntity movieEntity) {
                 mTextView.setText(movieEntity.toString());
             }
         };
-
+        ProgressSubscriber<MovieEntity> subscriber = new ProgressSubscriber<>(nextListener, MainActivity.this);
         HttpMethods.getInstance().getTopMovie(subscriber, 0, 10);
     }
 
