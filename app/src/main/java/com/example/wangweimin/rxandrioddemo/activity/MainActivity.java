@@ -8,20 +8,25 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.wangweimin.rxandrioddemo.R;
-import com.example.wangweimin.rxandrioddemo.entity.MovieEntity;
+import com.example.wangweimin.rxandrioddemo.entity.Subject;
+import com.example.wangweimin.rxandrioddemo.fragment.GridFragment;
 import com.example.wangweimin.rxandrioddemo.http.HttpMethods;
 import com.example.wangweimin.rxandrioddemo.subsciber.ProgressSubscriber;
 import com.example.wangweimin.rxandrioddemo.subsciber.SubscriberOnNextListener;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity {
-    @Bind(R.id.main_text_view)
-    TextView mTextView;
+    @Bind(R.id.main_content_view)
+    RelativeLayout mContentView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,13 +47,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void getMovie() {
-        SubscriberOnNextListener<MovieEntity> nextListener = new SubscriberOnNextListener<MovieEntity>() {
+        SubscriberOnNextListener<List<Subject>> nextListener = new SubscriberOnNextListener<List<Subject>>() {
             @Override
-            public void onNext(MovieEntity movieEntity) {
-                mTextView.setText(movieEntity.toString());
+            public void onNext(List<Subject> list) {
+                // TODO: 16/4/8 pass data to GridFragment and add GridFragment to layout
+                Bundle bundle = new Bundle();
+                bundle.putParcelableArrayList("subjects", (ArrayList<Subject>) list);
+                GridFragment gridFragment = new GridFragment();
+                gridFragment.setArguments(bundle);
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.main_content_view, gridFragment)
+                        .commit();
+
             }
         };
-        ProgressSubscriber<MovieEntity> subscriber = new ProgressSubscriber<>(nextListener, MainActivity.this);
+        ProgressSubscriber<List<Subject>> subscriber = new ProgressSubscriber<>(nextListener, MainActivity.this);
         HttpMethods.getInstance().getTopMovie(subscriber, 0, 10);
     }
 

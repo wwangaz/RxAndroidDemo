@@ -1,8 +1,10 @@
 package com.example.wangweimin.rxandrioddemo.http;
 
 import com.example.wangweimin.rxandrioddemo.entity.MovieEntity;
+import com.example.wangweimin.rxandrioddemo.entity.Subject;
 import com.example.wangweimin.rxandrioddemo.service.MovieService;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
@@ -46,9 +48,9 @@ public class HttpMethods {
         return SingletonHolder.INSTANCE;
     }
 
-    public void getTopMovie(Subscriber<MovieEntity> subscriber, int start, int count){
+    public void getTopMovie(Subscriber<List<Subject>> subscriber, int start, int count){
         movieService.getTopMovie(start, count)
-                .map(new HttpResultFunc<MovieEntity>())
+                .map(new HttpResultFunc<List<Subject>>())
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -58,7 +60,7 @@ public class HttpMethods {
     private class HttpResultFunc<T> implements Func1<HttpResult<T>, T> {
         @Override
         public T call(HttpResult<T> tHttpResult) {
-            if(tHttpResult.getResultCode() != 0)
+            if(tHttpResult.getResultCode() == 0)
                 throw new ApiException(tHttpResult.getResultCode());
 
             return tHttpResult.getData();

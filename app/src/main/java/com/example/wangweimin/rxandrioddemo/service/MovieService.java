@@ -1,7 +1,9 @@
 package com.example.wangweimin.rxandrioddemo.service;
 
+import com.example.wangweimin.rxandrioddemo.entity.Subject;
 import com.example.wangweimin.rxandrioddemo.http.HttpResult;
-import com.example.wangweimin.rxandrioddemo.entity.MovieEntity;
+
+import java.util.List;
 
 import retrofit2.http.GET;
 import retrofit2.http.Query;
@@ -12,5 +14,5 @@ import rx.Observable;
  */
 public interface MovieService {
     @GET("top250")
-    Observable<HttpResult<MovieEntity>> getTopMovie(@Query("start") int start, @Query("count") int count);
+    Observable<HttpResult<List<Subject>>> getTopMovie(@Query("start") int start, @Query("count") int count);
 }
