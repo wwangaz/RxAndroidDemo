@@ -43,7 +43,7 @@ public class GridFragment extends Fragment {
         Bundle bundle = getArguments();
         if (bundle != null) {
             subjects = bundle.getParcelableArrayList("subjects");
-            mAdapter = new GridAdapter(getContext());
+            mAdapter = new GridAdapter(getActivity());
 
             mRvRecyclerView.setAdapter(mAdapter);
 

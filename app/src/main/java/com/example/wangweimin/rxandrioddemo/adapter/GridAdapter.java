@@ -1,14 +1,18 @@
 package com.example.wangweimin.rxandrioddemo.adapter;
 
-import android.content.Context;
+import android.os.Build;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.RecyclerView;
+import android.transition.Fade;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
 import com.example.wangweimin.rxandrioddemo.R;
+import com.example.wangweimin.rxandrioddemo.animate.DetailTransition;
 import com.example.wangweimin.rxandrioddemo.entity.Subject;
+import com.example.wangweimin.rxandrioddemo.fragment.DetailFragment;
 import com.example.wangweimin.rxandrioddemo.viewholder.GridViewHolder;
 
 import java.util.ArrayList;
@@ -19,9 +23,9 @@ import java.util.List;
  */
 public class GridAdapter extends RecyclerView.Adapter<GridViewHolder> {
     private List<Subject> mDataList;
-    private Context mContext;
+    private FragmentActivity mContext;
 
-    public GridAdapter(Context context){
+    public GridAdapter(FragmentActivity context) {
         mDataList = new ArrayList<>();
         mContext = context;
     }
@@ -33,13 +37,33 @@ public class GridAdapter extends RecyclerView.Adapter<GridViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(GridViewHolder holder, int position) {
+    public void onBindViewHolder(final GridViewHolder holder, int position) {
         if (position >= mDataList.size())
             return;
-        Subject subject = mDataList.get(position);
+        final Subject subject = mDataList.get(position);
         if (subject.images != null)
             Glide.with(mContext).load(subject.images.medium).into(holder.mGridItemImg);
+        holder.mGridItemImg.setTransitionName(mContext.getResources().getString(R.string.transition_name));
         holder.mGridItemTv.setText(subject.title);
+        holder.mGridItemLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DetailFragment fragment = DetailFragment.newInstance(subject);
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    fragment.setSharedElementEnterTransition(new DetailTransition());
+                    fragment.setExitTransition(new Fade());
+                    fragment.setEnterTransition(new Fade());
+                    fragment.setSharedElementReturnTransition(new DetailTransition());
+                }
+
+                mContext.getSupportFragmentManager().beginTransaction()
+                        .addSharedElement(holder.mGridItemImg, mContext.getResources().getString(R.string.transition_name))
+                        .replace(R.id.main_content_view, fragment)
+                        .addToBackStack(null)
+                        .commit();
+            }
+        });
     }
 
     public void addData(List<Subject> addList) {
@@ -48,7 +72,7 @@ public class GridAdapter extends RecyclerView.Adapter<GridViewHolder> {
     }
 
     public void replaceData(List<Subject> replaceList) {
-        if (replaceList != null){
+        if (replaceList != null) {
             mDataList = replaceList;
             notifyDataSetChanged();
         }
